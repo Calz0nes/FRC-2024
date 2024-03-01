@@ -16,13 +16,16 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
 
+    /* Creates CommandSwerveDrivetrain */
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency, SwerveModuleConstants... modules) {
         super(driveTrainConstants, OdometryUpdateFrequency, modules);
     }
+    /* Creates CommandSwerveDrivetrain */
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, SwerveModuleConstants... modules) {
         super(driveTrainConstants, modules);
     }
 
+    // Used to move modules.
     public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
         return run(() -> this.setControl(requestSupplier.get()));
     }
