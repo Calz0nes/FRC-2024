@@ -81,10 +81,10 @@ public class RobotContainer {
     ));
 
     // Robot Alligns itself with Amp.
-    joystick.leftTrigger().whileTrue(new AutoAllignCMD(drivetrain, AmpAllignment));
+    joystick.leftBumper().whileTrue(new AutoAllignCMD(drivetrain, AmpAllignment));
 
     // Robot Alligns itself with Speaker.
-    joystick.rightTrigger().whileTrue(new AutoAllignCMD(drivetrain, SpeakerAllignment));
+    joystick.rightBumper().whileTrue(new AutoAllignCMD(drivetrain, SpeakerAllignment));
 
     /** Moves Arm up */
     new JoystickButton(equipmentController, 22).whileTrue(new ArmPIDCMD(armSubsystem, -23));
