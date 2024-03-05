@@ -9,6 +9,7 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.CommandSwerveDrivetrain;
 import frc.robot.LimelightHelpers;
@@ -18,6 +19,7 @@ public class AutoAllignCMD extends Command {
   private final CommandSwerveDrivetrain drivetrain;
   private final Pose2d desiredAllignment;
   private final PIDController translatePID, rotPID;
+  private final boolean debug = true;
 
   ChassisSpeeds chassisSpeeds;
   Pose2d currPose;
@@ -44,7 +46,7 @@ public class AutoAllignCMD extends Command {
   @Override
   public void execute() {
     // Get the current positon.
-    currPose = LimelightHelpers.getCameraPose3d_TargetSpace(ll).toPose2d();
+    currPose = LimelightHelpers.getCameraPose3d_RobotSpace(ll).toPose2d();
     
     // Create new ChassisSpeeds object and calculate the speeds using our PID controllers.
     chassisSpeeds = new ChassisSpeeds(translatePID.calculate(currPose.getX(), desiredAllignment.getX()),
@@ -54,7 +56,14 @@ public class AutoAllignCMD extends Command {
     // Litterly just sets the robot the the chassisSpeeds but this single line of code took me 30 minutes.
     drivetrain.applyRequest(() -> new SwerveRequest.ApplyChassisSpeeds().withSpeeds(chassisSpeeds));
 
-    
+    if (debug) {
+    SmartDashboard.putNumber("OutPut VX", chassisSpeeds.vxMetersPerSecond);
+    SmartDashboard.putNumber("OutPut VY", chassisSpeeds.vyMetersPerSecond);
+    SmartDashboard.putNumber("OutPut RotPS", chassisSpeeds.omegaRadiansPerSecond);
+    SmartDashboard.putNumber("LimeLight X", currPose.getX());
+    SmartDashboard.putNumber("LimeLight Y", currPose.getY());
+    SmartDashboard.putNumber("LimeLight Rot", currPose.getRotation().getRadians());
+    }
   }
 
   // Called once the command ends or is interrupted.
