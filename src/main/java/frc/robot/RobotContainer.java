@@ -21,6 +21,7 @@ import frc.robot.commands.ArmPIDCMD;
 import frc.robot.commands.AutoAllignCMD;
 import frc.robot.commands.IntakeCMD;
 import frc.robot.commands.PlacerCMD;
+import frc.robot.commands.SpeakerCMD;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Intake;
@@ -101,14 +102,11 @@ public class RobotContainer {
     /** Intake spitz out of Robot */
     new JoystickButton(equipmentController, 19).whileTrue(new IntakeCMD(intakeSubsystem, -0.7, -0.6));
 
-    /** Place Fast */
-    new JoystickButton(equipmentController, 11).whileTrue(new PlacerCMD(placerSubsystem, 1, 1));
-
-    /** Place Slow */
+    /** Place Amp */
     new JoystickButton(equipmentController, 12).whileTrue(new PlacerCMD(placerSubsystem, -0.1, -0.1));
 
-    /** Creeps Front Motors Forward*/
-    new JoystickButton(equipmentController, 13).whileTrue(new PlacerCMD(placerSubsystem, 0.05, 0));
+    /** Place Speaker */
+    new JoystickButton(equipmentController, 0).whileTrue(new SpeakerCMD(placerSubsystem));
 
     /** Creeps Front Motors Backward*/
     new JoystickButton(equipmentController, 14).whileTrue(new PlacerCMD(placerSubsystem, -0.05, 0));
@@ -116,9 +114,6 @@ public class RobotContainer {
     /** Creeps Back Motors Backward*/
     new JoystickButton(equipmentController, 15).whileTrue(new PlacerCMD(placerSubsystem, 0, -0.05));
 
-    /** Creeps Back Motors Forward*/
-    new JoystickButton(equipmentController, 16).whileTrue(new PlacerCMD(placerSubsystem, 0, 0.05));
-    
     drivetrain.registerTelemetry(logger::telemeterize);
   }
 
