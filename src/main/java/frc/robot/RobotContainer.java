@@ -8,13 +8,17 @@ package frc.robot;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
 import frc.robot.commands.ArmPIDCMD;
+import frc.robot.commands.AutoAllignCMD;
 import frc.robot.commands.IntakeCMD;
 import frc.robot.commands.PlacerCMD;
 import frc.robot.generated.TunerConstants;
@@ -22,17 +26,20 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Placer;
 
+
 public class RobotContainer {
   private double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
   private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
-  private double TurtleModify = 3;
+  private double TurtleModifier = 3;
+  private final Pose2d AmpAllignment = new Pose2d(new Translation2d(0, 0), new Rotation2d(0));
+  private final Pose2d SpeakerAllignment = new Pose2d(new Translation2d(0, 0), new Rotation2d(0));
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final CommandXboxController joystick = new CommandXboxController(0); // My joystick
   private final Joystick equipmentController = new Joystick(1);
 
   // Define Subsystems here.
-  private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
+  final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
   private final Arm armSubsystem = new Arm();
   private final Intake intakeSubsystem = new Intake();
   private final Placer placerSubsystem = new Placer();
@@ -46,6 +53,7 @@ public class RobotContainer {
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
+
   // Assign commands to buttons here.
   private void configureBindings() {
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
@@ -55,19 +63,28 @@ public class RobotContainer {
             .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left).
         ));
 
+    // Brakes go brrr.
     joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+
+    // Points the modules.
     joystick.b().whileTrue(drivetrain
         .applyRequest(() -> point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))));
 
-    // reset the field-centric heading on left bumper press.
-    joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
+    // Reset the field-centric heading on left bumper press.
+    joystick.leftTrigger().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
 
     // Turtle Mode (slow).
-    joystick.rightTrigger().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed/TurtleModify) // Drive forward with.
+    joystick.rightTrigger().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed/TurtleModifier) // Drive forward with.
                                                                                            // negative Y (forward).
-            .withVelocityY(-joystick.getLeftX() * MaxSpeed/TurtleModify) // Drive left with negative X (left).
-            .withRotationalRate(-joystick.getRightX() * MaxAngularRate/TurtleModify) // Drive counterclockwise with negative X (left).
+            .withVelocityY(-joystick.getLeftX() * MaxSpeed/TurtleModifier) // Drive left with negative X (left).
+            .withRotationalRate(-joystick.getRightX() * MaxAngularRate/TurtleModifier) // Drive counterclockwise with negative X (left).
     ));
+
+    // Robot Alligns itself with Amp.
+    joystick.leftTrigger().whileTrue(new AutoAllignCMD(drivetrain, AmpAllignment));
+
+    // Robot Alligns itself with Speaker.
+    joystick.rightTrigger().whileTrue(new AutoAllignCMD(drivetrain, SpeakerAllignment));
 
     /** Moves Arm up */
     new JoystickButton(equipmentController, 22).whileTrue(new ArmPIDCMD(armSubsystem, -23));
