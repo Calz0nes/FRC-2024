@@ -31,7 +31,7 @@ import frc.robot.subsystems.Placer;
 public class RobotContainer {
   private double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
   private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
-  private double TurtleModifier = 3;
+  private double TurtleModifier = 0.3;
   private final Pose2d AmpAllignment = new Pose2d(new Translation2d(0, 0), new Rotation2d(0));
   private final Pose2d SpeakerAllignment = new Pose2d(new Translation2d(0, 0), new Rotation2d(0));
 
@@ -75,10 +75,10 @@ public class RobotContainer {
     joystick.leftTrigger().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
 
     // Turtle Mode (slow).
-    joystick.rightTrigger().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed/TurtleModifier) // Drive forward with.
+    joystick.rightTrigger().whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed * TurtleModifier) // Drive forward with.
                                                                                            // negative Y (forward).
-            .withVelocityY(-joystick.getLeftX() * MaxSpeed/TurtleModifier) // Drive left with negative X (left).
-            .withRotationalRate(-joystick.getRightX() * MaxAngularRate/TurtleModifier) // Drive counterclockwise with negative X (left).
+            .withVelocityY(-joystick.getLeftX() * MaxSpeed * TurtleModifier) // Drive left with negative X (left).
+            .withRotationalRate(-joystick.getRightX() * MaxAngularRate * TurtleModifier) // Drive counterclockwise with negative X (left).
     ));
 
     // Robot Alligns itself with Amp.
@@ -106,7 +106,7 @@ public class RobotContainer {
     new JoystickButton(equipmentController, 12).whileTrue(new PlacerCMD(placerSubsystem, -0.1, -0.1));
 
     /** Place Speaker */
-    new JoystickButton(equipmentController, 0).whileTrue(new SpeakerCMD(placerSubsystem));
+    new JoystickButton(equipmentController, 21).whileTrue(new SpeakerCMD(placerSubsystem));
 
     /** Creeps Front Motors Backward*/
     new JoystickButton(equipmentController, 14).whileTrue(new PlacerCMD(placerSubsystem, -0.05, 0));
