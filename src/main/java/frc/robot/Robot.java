@@ -4,13 +4,17 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
+  private PowerDistribution PDB = new PowerDistribution(0, ModuleType.kRev);
 
   @Override
   public void robotInit() {
@@ -20,6 +24,14 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    SmartDashboard.putNumber("LeftFront Drive", PDB.getCurrent(10));
+    SmartDashboard.putNumber("RightFront Drive", PDB.getCurrent(11));
+    SmartDashboard.putNumber("LeftBack Drive", PDB.getCurrent(12));
+    SmartDashboard.putNumber("RightBack Drive", PDB.getCurrent(13));
+    SmartDashboard.putNumber("LeftFront Turning", PDB.getCurrent(19));
+    SmartDashboard.putNumber("RightFront Turning", PDB.getCurrent(18));
+    SmartDashboard.putNumber("LeftBack Turning", PDB.getCurrent(17));
+    SmartDashboard.putNumber("RightBack Turning", PDB.getCurrent(16));
   }
 
   @Override
